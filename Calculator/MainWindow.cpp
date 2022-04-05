@@ -21,22 +21,27 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui.button_comma, &QPushButton::clicked, this, [=] { onFormNumber(Comma); });
 	connect(ui.button_backspace, &QPushButton::clicked, this, [=] { onFormNumber(Backspace); });
 
-	connect(ui.button_add, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Add); textNumber = ""; });
-	connect(ui.button_sub, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Sub); textNumber = ""; });
-	connect(ui.button_mul, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Mul); textNumber = ""; });
-	connect(ui.button_div, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Div); textNumber = ""; });
-	connect(ui.button_1_div_x, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::OneDivX); textNumber = ""; });
-	connect(ui.button_pow_2, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Pow2); textNumber = ""; });
-	connect(ui.button_sqrt_x, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::SqrtX); textNumber = ""; });
+	connect(ui.button_add, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Add); textNumber = "0"; });
+	connect(ui.button_sub, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Sub); textNumber = "0"; });
+	connect(ui.button_mul, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Mul); textNumber = "0"; });
+	connect(ui.button_div, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Div); textNumber = "0"; });
+	connect(ui.button_1_div_x, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::OneDivX); });
+	connect(ui.button_pow_2, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::Pow2); });
+	connect(ui.button_sqrt_x, &QPushButton::clicked, this, [=] { calc.SetFirstValueAndOperation(CommaToPoint(textNumber), Calculator::Operation::SqrtX); });
 	
-	connect(ui.button_clear, &QPushButton::clicked, this, [=] { calc.Clear(); textNumber = "";});
-	connect(ui.button_equal, &QPushButton::clicked, this, [=] {calc.Calculate(CommaToPoint(textNumber)); textNumber = ""; });
+	connect(ui.button_clear, &QPushButton::clicked, this, [=] { calc.Clear(); textNumber = "0";});
+	connect(ui.button_equal, &QPushButton::clicked, this, [=] {calc.Calculate(CommaToPoint(textNumber)); });
 	
 	connect(&calc, &Calculator::resultCalculated, this, &MainWindow::onSetResult);
+
+	calc.Clear();
+	textNumber = "0";
 }
 
 void MainWindow::onFormNumber(EditType editType)
 {
+	if (textNumber == "0" && editType >= 0 && editType <= 9)
+		textNumber = "";
 	// digits
 	if (editType == Digit_0)
 		textNumber += "0";
@@ -63,7 +68,7 @@ void MainWindow::onFormNumber(EditType editType)
 	{
 		if (textNumber[0] == '-')
 			textNumber.remove('-');
-		else
+		else if (textNumber != "0")
 			textNumber = '-' + textNumber;
 	}
 	// ,
@@ -83,7 +88,7 @@ void MainWindow::onFormNumber(EditType editType)
 			textNumber = "0";
 		else if (textNumber.length() == 2 && textNumber[0] == '-')
 			textNumber = "0";
-		else
+		else if (textNumber != "0")
 			textNumber.chop(1);
 	}
 	ui.edit_display->setText(textNumber);
@@ -91,6 +96,7 @@ void MainWindow::onFormNumber(EditType editType)
 void MainWindow::onSetResult(QString result)
 {
 	ui.edit_display->setText(result);
+	textNumber = result;
 }
 double MainWindow::CommaToPoint(QString str)
 {

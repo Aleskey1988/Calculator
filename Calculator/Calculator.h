@@ -30,6 +30,8 @@ signals:
 	void resultCalculated(QString result);
 
 private:
+	QString simplifyResult(double result);
+
 	double firstValue = 0.0;
 	bool firstValueSet = false;
 	Operation op;

@@ -22,7 +22,7 @@ void Calculator::SetFirstValueAndOperation(double firstValue, Operation op)
 		if (firstValue != 0.0)
 		{
 			double result = 1.0 / firstValue;
-			QString textResult = QString::number(result, 'f', 5);
+			QString textResult = simplifyResult(result);
 			emit resultCalculated(textResult);
 		}
 		else
@@ -31,7 +31,7 @@ void Calculator::SetFirstValueAndOperation(double firstValue, Operation op)
 	else if (op == Operation::Pow2)
 	{
 		double result = qPow(firstValue, 2);
-		QString textResult = QString::number(result, 'f', 5);
+		QString textResult = simplifyResult(result);
 		emit resultCalculated(textResult);
 	}
 	else if (op == Operation::SqrtX)
@@ -39,7 +39,7 @@ void Calculator::SetFirstValueAndOperation(double firstValue, Operation op)
 		if (firstValue >= 0.0)
 		{
 			double result = qSqrt(firstValue);
-			QString textResult = QString::number(result, 'f', 5);
+			QString textResult = simplifyResult(result);
 			emit resultCalculated(textResult);
 		}
 		else
@@ -70,10 +70,29 @@ void Calculator::Calculate(double secondValue)
 			textResult = "Division by zero";
 	}
 	if (textResult.isEmpty())
-		textResult = QString::number(result, 'f', 5);
+	{
+		textResult = simplifyResult(result);
+	}
+	firstValue = textResult.toDouble();
 	emit resultCalculated(textResult);
 }
 void Calculator::Clear()
 {
 	firstValueSet = false;
+	emit resultCalculated("0");
+}
+
+QString Calculator::simplifyResult(double result)
+{
+	QString str = QString::number(result, 'f', 5);
+	if (str.contains("."))
+	{
+		while (str[str.length() - 1] == '0')
+		{
+			str.chop(1);
+		}
+		if (str[str.length() - 1] == '.')
+			str.chop(1);
+	}
+	return str;
 }
